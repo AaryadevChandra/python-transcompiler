@@ -18,19 +18,19 @@ bool is_operator_char(char c){
 
 void identifier_char_state_handler(char buffer[], int it, FILE* tokens_filehandle)
 {
-  printf("\nchecking value %c", buffer[it]);
+  // printf("\nchecking value %c", buffer[it]);
   if(buffer[it] != '\0'){
     if(is_identifier_char(buffer[it])){
-      printf("\nidentifier case was ran");
-      printf("\nprinting chars now\n");
-      printf("%c", buffer[it]);
+      // printf("\nidentifier case was ran");
+      // printf("\nprinting chars now\n");
+      // printf("%c", buffer[it]);
 
       fputc(buffer[it], tokens_filehandle);
       it++;
       identifier_char_state_handler(buffer, it, tokens_filehandle);
     }
     else if(is_operator_char(buffer[it])){
-      printf("\noperator case was ran");
+      // printf("\noperator case was ran");
       fputs("\n", tokens_filehandle);
       int op_count = 0;
       // if not an identifier character
@@ -47,23 +47,23 @@ void identifier_char_state_handler(char buffer[], int it, FILE* tokens_filehandl
 void symbol_state_handler(char buffer[], int it, int op_count, FILE* tokens_filehandle){
 
 
-  printf("\nchecking value %c", buffer[it]);
+  // printf("\nchecking value %c", buffer[it]);
   if(buffer[it] != '\0'){
     if(is_operator_char(buffer[it])){
-      printf("\noperator case was ran");
+      // printf("\noperator case was ran");
       op_count++;
       if(op_count > 3){
         printf("\nError! Cannot have more than 3 operators in an expression");
         return ;
       }
-      printf("\nprinting symbols now\n");
-      printf("%c", buffer[it]);
+      // printf("\nprinting symbols now\n");
+      // printf("%c", buffer[it]);
       fputc(buffer[it], tokens_filehandle);
       it++;
       symbol_state_handler(buffer, it, op_count, tokens_filehandle);
     }
     else if(is_identifier_char(buffer[it])){
-      printf("\nidentifier case was ran");
+      // printf("\nidentifier case was ran");
       fputs("\n", tokens_filehandle);
       identifier_char_state_handler(buffer, it, tokens_filehandle);
     }
