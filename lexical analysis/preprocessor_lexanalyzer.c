@@ -3,14 +3,24 @@
 #include<stdlib.h>
 #include<stdbool.h>
 
-int main()
+int main(int argc, char** argv)
 {
 
     // preprocessing beginning
 
-  FILE* source_filehandle = fopen("p1.py", "r+");
+    if(argv[1] == NULL || argv[2] == NULL) {
+      printf("Please supply the correct no. of args");
+      exit(1);
+    }
 
-  FILE* intermediate_filehandle = fopen("practice.py", "a+");
+  if(source_filehandle == NULL || intermediate_filehandle == NULL){
+    printf("Filename supplied not found");
+    exit(1);
+  }
+
+  FILE* source_filehandle = fopen(argv[1], "r+");
+  FILE* intermediate_filehandle = fopen(argv[2], "a+");
+
 
   char source_buffer[100];
   char intermediate_buffer[100];
