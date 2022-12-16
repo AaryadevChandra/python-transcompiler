@@ -3,28 +3,22 @@
 #include<stdlib.h>
 #include<stdbool.h>
 
-int main(int argc, char** argv)
+FILE* lexical_preprocessing(char* source_filename)
 {
 
     // preprocessing beginning
 
-    if(argv[1] == NULL || argv[2] == NULL) {
-      printf("Please supply the correct no. of args");
-      exit(1);
-    }
+  FILE* source_filehandle = fopen(source_filename, "r+");
 
-  if(source_filehandle == NULL || intermediate_filehandle == NULL){
+  if(source_filehandle == NULL){
     printf("Filename supplied not found");
     exit(1);
   }
 
-  FILE* source_filehandle = fopen(argv[1], "r+");
-  FILE* intermediate_filehandle = fopen(argv[2], "a+");
-
+  FILE* intermediate_filehandle = fopen("intermediate_file.py", "a+");
 
   char source_buffer[100];
   char intermediate_buffer[100];
-
 
   int line_number= 1 ;
 
@@ -36,10 +30,7 @@ int main(int argc, char** argv)
     printf("\nline number %d", line_number);
     printf("\n%c ----> %d", source_buffer[0], source_buffer[0]);
 
-
-
     int stop_anayzing_flag = 0;
-
 
     while(source_buffer[source_buffer_it] != '\0'){
       if(source_buffer[source_buffer_it] == '#') break;
@@ -70,5 +61,11 @@ int main(int argc, char** argv)
 
     line_number++;
   }
-
+  fclose(intermediate_filehandle);
+  fclose(source_filehandle);
 }
+
+// int main()
+// {
+//   lexical_preprocessing("p1.py");
+// }

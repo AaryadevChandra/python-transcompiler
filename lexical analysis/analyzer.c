@@ -2,6 +2,7 @@
 #include<stdlib.h>
 #include<stdbool.h>
 #include<string.h>
+#include "preprocessor_lexanalyzer.h"
 
 void symbol_state_handler(char buffer[], int it, int op_count, FILE* tokens_filehandle);
 void  identifier_char_state_handler(char buffer[], int it, FILE* tokens_filehandle);
@@ -43,7 +44,6 @@ void identifier_char_state_handler(char buffer[], int it, FILE* tokens_filehandl
 
 }
 
-
 void symbol_state_handler(char buffer[], int it, int op_count, FILE* tokens_filehandle){
 
 
@@ -74,27 +74,32 @@ void symbol_state_handler(char buffer[], int it, int op_count, FILE* tokens_file
   }
 }
 
-int main()
+int main(int argc, char** argv)
 {
-  FILE* filehandle = fopen("p1.py", "r+");
+
+  if(argv[1] == NULL || argv[2] == NULL) {
+    printf("Please supply the correct no. of args");
+    exit(1);
+  }
+
+  // p1.py
+  lexical_preprocessing(argv[1]);
+
+  FILE* intermediate_filehandle = fopen("intermediate_file.py", "r+");
 
   int op_count = 0;
   int it=0;
   char buffer[100];
 
-  FILE* tokens_filehandle = fopen("tokens.py", "a+");
+  FILE* tokens_filehandle = fopen(argv[2], "a+");
 
-
-  while(fgets(buffer, 100, filehandle)!=NULL){
+  while(fgets(buffer, 100, intermediate_filehandle)!=NULL){
     if(is_identifier_char(buffer[it])){
       identifier_char_state_handler(buffer, it, tokens_filehandle);
     }
     else if(is_operator_char(buffer[it])){
       symbol_state_handler(buffer, it, op_count, tokens_filehandle);
     }
-
     fputs("\n", tokens_filehandle);
   }
-
-
 }
