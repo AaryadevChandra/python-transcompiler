@@ -43,7 +43,7 @@ FILE* lexical_preprocessing(char* source_filename)
         intermediate_buffer_it++;
       }
       else if(source_buffer[source_buffer_it] == ' ' && stop_anayzing_flag == 0){
-        intermediate_buffer[intermediate_buffer_it] = '-';
+        intermediate_buffer[intermediate_buffer_it] = source_buffer[source_buffer_it];
         intermediate_buffer_it++;
       }
       else if(source_buffer[source_buffer_it] == ' ' && stop_anayzing_flag == 1 ){
