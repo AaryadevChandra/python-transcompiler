@@ -64,8 +64,3 @@ FILE* lexical_preprocessing(char* source_filename)
   fclose(intermediate_filehandle);
   fclose(source_filehandle);
 }
-
-// int main()
-// {
-//   lexical_preprocessing("p1.py");
-// }
