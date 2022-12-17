@@ -4,32 +4,8 @@
 #include<string.h>
 #include "preprocessor_lexanalyzer.h"
 
-int symbol_state_handler(char buffer[], int it, int op_count, FILE* tokens_filehandle, int return_value);
-int identifier_char_state_handler(char buffer[], int it, FILE* tokens_filehandle, int return_value);
-
-
-int file_rollback_error_handler(char* filename_to_delete)
-{
-  printf("\nError detected!");
-  printf("\nDeleting created files...");
-
-  // defining variable for string formatting ; stores file name of token file
-  char token_file_name[10];
-  sprintf(token_file_name, "%s", filename_to_delete);
-  if(remove("intermediate_file.py") || remove(token_file_name)){
-    printf("\nError deleting created files...");
-    return -1;
-  }
-  else{
-    printf("\nFiles deleted sucessfully...rollback successful");
-  }
-
-  return 0;
-}
-
-
-
-
+void symbol_state_handler(char buffer[], int it, int op_count, FILE* tokens_filehandle);
+void  identifier_char_state_handler(char buffer[], int it, FILE* tokens_filehandle);
 
 bool is_identifier_char(char c){
   return (c >= 65 && c <= 90) || (c >= 97 && c <= 122)
@@ -40,49 +16,39 @@ bool is_operator_char(char c){
   return (c >= 33 && c <= 47) || (c >= 58 && c <= 64) ? true : false;
 }
 
-int identifier_char_state_handler(char buffer[], int it, FILE* tokens_filehandle, int return_value)
+void identifier_char_state_handler(char buffer[], int it, FILE* tokens_filehandle)
 {
-
-  if(return_value == -1){
-    return -1;
-  }
-
   if(buffer[it] != '\0'){
     if(is_identifier_char(buffer[it])){
       fputc(buffer[it], tokens_filehandle);
       it++;
-      identifier_char_state_handler(buffer, it, tokens_filehandle, return_value);
+      identifier_char_state_handler(buffer, it, tokens_filehandle);
     }
     else if(is_operator_char(buffer[it])){
       fputs("\n", tokens_filehandle);
       int op_count = 0;
       // if not an identifier character
-      symbol_state_handler(buffer, it, op_count, tokens_filehandle, return_value);
+      symbol_state_handler(buffer, it, op_count, tokens_filehandle);
     }
-
-    // 2 characters cannot exist with only a space bw them
     else if(buffer[it] == ' ' && is_identifier_char(buffer[it + 1])){
-
-      printf("\nreturning -1 to main function");
-      return_value = -1;
+      printf("\nError identified due to faulty identifier char expressions");
+      exit(1);
     }
     else{
       it++;
-      identifier_char_state_handler(buffer, it, tokens_filehandle, return_value);
+      identifier_char_state_handler(buffer, it, tokens_filehandle);
     }
   }
-  return 0;
-
 }
 
-int symbol_state_handler(char buffer[], int it, int op_count, FILE* tokens_filehandle, int return_value){
+void symbol_state_handler(char buffer[], int it, int op_count, FILE* tokens_filehandle){
 
   if(buffer[it] != '\0'){
     if(is_operator_char(buffer[it])){
       op_count++;
       if(op_count > 3){
         printf("\nError! Cannot have more than 3 operators in an expression");
-        return -1;
+        return ;
       }
       fputc(buffer[it], tokens_filehandle);
       it++;
@@ -90,15 +56,13 @@ int symbol_state_handler(char buffer[], int it, int op_count, FILE* tokens_fileh
     }
     else if(is_identifier_char(buffer[it])){
       fputs("\n", tokens_filehandle);
-      identifier_char_state_handler(buffer, it, tokens_filehandle, return_value);
+      identifier_char_state_handler(buffer, it, tokens_filehandle);
     }
     else{
       it++;
       symbol_state_handler(buffer, it, 0, tokens_filehandle);
     }
   }
-
-  return 0;
 }
 
 int main(int argc, char** argv)
@@ -120,21 +84,12 @@ int main(int argc, char** argv)
 
   FILE* tokens_filehandle = fopen(argv[2], "a+");
 
-  int return_value = 0;
-
   while(fgets(buffer, 100, intermediate_filehandle)!=NULL){
     if(is_identifier_char(buffer[it])){
-      int char_state_handler_result = identifier_char_state_handler(buffer, it, tokens_filehandle, return_value);
-      if(char_state_handler_result == -1 ){
-        printf("\nrolling back file creation");
-        file_rollback_error_handler(argv[2]);
-      }
+      identifier_char_state_handler(buffer, it, tokens_filehandle);
     }
     else if(is_operator_char(buffer[it])){
-      int symbol_state_handler_result = symbol_state_handler(buffer, it, op_count, tokens_filehandle);
-      if(symbol_state_handler_result == -1){
-        file_rollback_error_handler(argv[2]);
-      }
+      symbol_state_handler(buffer, it, op_count, tokens_filehandle);
     }
     fputs("\n", tokens_filehandle);
   }
