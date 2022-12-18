@@ -16,6 +16,36 @@ bool is_operator_char(char c){
   return (c >= 33 && c <= 47) || (c >= 58 && c <= 64) ? true : false;
 }
 
+
+void string_state_handler(char buffer[], int it, FILE* tokens_filehandle)
+{
+
+  printf("\nstring state handler at %d", it);
+  if(buffer[it] == '"'){
+    fputc(buffer[it], tokens_filehandle);
+    it++;
+    while(buffer[it] != '"'){
+      fputc(buffer[it], tokens_filehandle);
+      it++;
+    }
+    fputc(buffer[it], tokens_filehandle);
+  }
+
+  it++;
+  printf("\nexiting string state handler at %d", it);
+  if(is_identifier_char(buffer[it])) {
+    identifier_char_state_handler(buffer, it, tokens_filehandle);
+  }
+  else if(is_operator_char(buffer[it])){
+    symbol_state_handler(buffer, it, 0, tokens_filehandle);
+  }
+  else{
+    identifier_char_state_handler(buffer, it, tokens_filehandle);
+  }
+}
+
+
+
 void identifier_char_state_handler(char buffer[], int it, FILE* tokens_filehandle)
 {
   if(buffer[it] != '\0'){
@@ -30,10 +60,10 @@ void identifier_char_state_handler(char buffer[], int it, FILE* tokens_filehandl
       // if not an identifier character
       symbol_state_handler(buffer, it, op_count, tokens_filehandle);
     }
-    else if(buffer[it] == ' ' && is_identifier_char(buffer[it + 1])){
-      printf("\nError identified due to faulty identifier char expressions");
-      exit(1);
-    }
+    // else if(buffer[it] == ' ' && is_identifier_char(buffer[it + 1])){
+    //   printf("\nError identified due to faulty identifier char expressions");
+    //   exit(1);
+    // }
     else{
       it++;
       identifier_char_state_handler(buffer, it, tokens_filehandle);
@@ -44,7 +74,7 @@ void identifier_char_state_handler(char buffer[], int it, FILE* tokens_filehandl
 void symbol_state_handler(char buffer[], int it, int op_count, FILE* tokens_filehandle){
 
   if(buffer[it] != '\0'){
-    if(is_operator_char(buffer[it])){
+    if(is_operator_char(buffer[it]) && buffer[it] != '"'){
       op_count++;
       if(op_count > 3){
         printf("\nError! Cannot have more than 3 operators in an expression");
@@ -53,6 +83,10 @@ void symbol_state_handler(char buffer[], int it, int op_count, FILE* tokens_file
       fputc(buffer[it], tokens_filehandle);
       it++;
       symbol_state_handler(buffer, it, op_count, tokens_filehandle);
+    }
+    else if(buffer[it] == '"'){
+      fputs("\n", tokens_filehandle);
+      string_state_handler(buffer, it, tokens_filehandle);
     }
     else if(is_identifier_char(buffer[it])){
       fputs("\n", tokens_filehandle);
