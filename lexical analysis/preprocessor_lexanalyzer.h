@@ -27,8 +27,8 @@ FILE* lexical_preprocessing(char* source_filename)
     int source_buffer_it= 0;
     int intermediate_buffer_it = 0;
 
-    printf("\nline number %d", line_number);
-    printf("\n%c ----> %d", source_buffer[0], source_buffer[0]);
+    // printf("\nline number %d", line_number);
+    // printf("\n%c ----> %d", source_buffer[0], source_buffer[0]);
 
     int stop_anayzing_flag = 0;
 
