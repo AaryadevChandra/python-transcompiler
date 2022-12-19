@@ -3,8 +3,11 @@
 #include<stdbool.h>
 #include<string.h>
 #include "preprocessor_lexanalyzer.h"
+#include "remove_unicode.h"
 
 #define CURRENT_TOKEN_SIZE 100
+#define NUM_KEYWORDS 36
+#define MAX_KEYWORD_LEN 20
 
 void symbol_state_handler(char buffer[], int it, int op_count, FILE* tokens_filehandle, char curr_token[]);
 void  identifier_char_state_handler(char buffer[], int it, FILE* tokens_filehandle, char curr_token[]);
@@ -20,7 +23,7 @@ bool is_operator_char(char c){
 
 int is_keyword(char curr_token[])
 {
-  char keywords[36][20] = {
+  char keywords[NUM_KEYWORDS][MAX_KEYWORD_LEN] = {
     "False",
     "None",
     "True",
@@ -58,7 +61,7 @@ int is_keyword(char curr_token[])
     "with",
     "yield"};
 
-  for(int i=0;i<36;i++){
+  for(int i=0;i<NUM_KEYWORDS;i++){
     if(!strcmp(curr_token, keywords[i])) return true;
   }
   return false;
@@ -92,7 +95,9 @@ void identifier_char_state_handler(char buffer[], int it, FILE* tokens_filehandl
   if(buffer[it] != '\0'){
     if(is_identifier_char(buffer[it])){
       curr_token[it] = buffer[it];
+      printf("\n%c", curr_token[it]);
       if(is_keyword(curr_token)){
+        printf("\n%s is a keyword", curr_token);
         memset(curr_token, 0, CURRENT_TOKEN_SIZE);
         fputc(buffer[it], tokens_filehandle);
         fputs("\n", tokens_filehandle);
@@ -107,11 +112,13 @@ void identifier_char_state_handler(char buffer[], int it, FILE* tokens_filehandl
     }
     else if(is_operator_char(buffer[it])){
       fputs("\n", tokens_filehandle);
+      memset(curr_token, 0, CURRENT_TOKEN_SIZE);
       int op_count = 0;
       // if not an identifier character
       symbol_state_handler(buffer, it, op_count, tokens_filehandle, curr_token);
     }
     else{
+      memset(curr_token, 0, CURRENT_TOKEN_SIZE);
       it++;
       identifier_char_state_handler(buffer, it, tokens_filehandle, curr_token);
     }
@@ -157,7 +164,9 @@ int main(int argc, char** argv)
   // p1.py
   lexical_preprocessing(argv[1]);
 
-  FILE* intermediate_filehandle = fopen("intermediate_file.py", "r+");
+  remove_unicode("intermediate_file.py");
+
+  FILE* intermediate_filehandle = fopen("intermediate_file2.py", "r+");
 
   int op_count = 0;
   int it=0;
