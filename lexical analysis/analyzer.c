@@ -59,9 +59,7 @@ int is_keyword(char curr_token[])
     "yield"};
 
   for(int i=0;i<36;i++){
-    if(!strcmp(curr_token, keywords[i])){
-      return true;
-    }
+    if(!strcmp(curr_token, keywords[i])) return true;
   }
   return false;
 }
@@ -77,7 +75,6 @@ void string_state_handler(char buffer[], int it, FILE* tokens_filehandle, char c
     }
     fputc(buffer[it], tokens_filehandle);
   }
-
   it++;
   if(is_identifier_char(buffer[it])) {
     identifier_char_state_handler(buffer, it, tokens_filehandle, curr_token);
@@ -90,18 +87,12 @@ void string_state_handler(char buffer[], int it, FILE* tokens_filehandle, char c
   }
 }
 
-
-
 void identifier_char_state_handler(char buffer[], int it, FILE* tokens_filehandle, char curr_token[])
 {
-
   if(buffer[it] != '\0'){
     if(is_identifier_char(buffer[it])){
-      printf("\n%s", curr_token);
-
       curr_token[it] = buffer[it];
       if(is_keyword(curr_token)){
-        printf("\n %s is a keyword", curr_token);
         memset(curr_token, 0, CURRENT_TOKEN_SIZE);
         fputc(buffer[it], tokens_filehandle);
         fputs("\n", tokens_filehandle);
@@ -120,10 +111,6 @@ void identifier_char_state_handler(char buffer[], int it, FILE* tokens_filehandl
       // if not an identifier character
       symbol_state_handler(buffer, it, op_count, tokens_filehandle, curr_token);
     }
-    // else if(buffer[it] == ' ' && is_identifier_char(buffer[it + 1])){
-    //   printf("\nError identified due to faulty identifier char expressions");
-    //   exit(1);
-    // }
     else{
       it++;
       identifier_char_state_handler(buffer, it, tokens_filehandle, curr_token);
@@ -133,12 +120,11 @@ void identifier_char_state_handler(char buffer[], int it, FILE* tokens_filehandl
 
 void symbol_state_handler(char buffer[], int it, int op_count, FILE* tokens_filehandle, char curr_token[]){
 
-  // printf("\n\t\t%s", curr_token);
   if(buffer[it] != '\0'){
     if(is_operator_char(buffer[it]) && buffer[it] != '"'){
       op_count++;
       if(op_count > 3){
-        printf("\nError! Cannot have more than 3 operators in an expression");
+        printf("\nError! Exiting...");
         return ;
       }
       fputc(buffer[it], tokens_filehandle);
