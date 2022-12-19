@@ -78,6 +78,7 @@ void string_state_handler(char buffer[], int it, FILE* tokens_filehandle, char c
     }
     fputc(buffer[it], tokens_filehandle);
   }
+  fputc('\n', tokens_filehandle);
   it++;
   if(is_identifier_char(buffer[it])) {
     identifier_char_state_handler(buffer, it, tokens_filehandle, curr_token);
@@ -95,9 +96,7 @@ void identifier_char_state_handler(char buffer[], int it, FILE* tokens_filehandl
   if(buffer[it] != '\0'){
     if(is_identifier_char(buffer[it])){
       curr_token[it] = buffer[it];
-      printf("\n%c", curr_token[it]);
       if(is_keyword(curr_token)){
-        printf("\n%s is a keyword", curr_token);
         memset(curr_token, 0, CURRENT_TOKEN_SIZE);
         fputc(buffer[it], tokens_filehandle);
         fputs("\n", tokens_filehandle);
@@ -125,7 +124,8 @@ void identifier_char_state_handler(char buffer[], int it, FILE* tokens_filehandl
   }
 }
 
-void symbol_state_handler(char buffer[], int it, int op_count, FILE* tokens_filehandle, char curr_token[]){
+void symbol_state_handler(char buffer[], int it, int op_count, FILE* tokens_filehandle, char curr_token[])
+{
 
   if(buffer[it] != '\0'){
     if(is_operator_char(buffer[it]) && buffer[it] != '"'){
@@ -184,6 +184,9 @@ int main(int argc, char** argv)
     }
     else if(is_operator_char(buffer[it])){
       symbol_state_handler(buffer, it, op_count, tokens_filehandle, curr_token);
+    }
+    else{
+      identifier_char_state_handler(buffer, it, tokens_filehandle, curr_token);
     }
     fputs("\n", tokens_filehandle);
   }
